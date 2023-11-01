@@ -19,16 +19,18 @@ namespace CRUDAccessoDiretto
             public string nome;
             public float prezzo;
             public int quantita;
+            public int CodProdotto;
+            public bool eliminato;
         }
         public Prodotto[] p;
         public int dim;
         public int quanti = 1;
-        public int dimCodProdotto;
+        public int codProd = 1;
         bool Confermadelete = false;
         bool Confermaupdate = false;
         bool ConfermaQuantita = false;
         public int[] CodProdotto;
-        public string Nome = "@"; public string Prezzo = "@"; public int Quantita = 0;  // campi per record vuoto
+        public string Nome = "@"; public int Prezzo = 0; public int Quantita = 0;  // campi per record vuoto
         public int size = 64;  // lunghezza (30+30+4) del record PREFISSATA
         public int NumeroRecord;
         public string riga;
@@ -38,9 +40,8 @@ namespace CRUDAccessoDiretto
         {
             InitializeComponent();
             dim = 0;
-            dimCodProdotto = 0;
             p = new Prodotto[dim];
-            CodProdotto = new int[dimCodProdotto];
+            CodProdotto = new int[dim];
             DELETE.Enabled = false;
             UPDATE.Enabled = false;
             QUANTITA.Enabled = false;
@@ -79,6 +80,21 @@ namespace CRUDAccessoDiretto
                 p[dim].nome = NOME.Text;
                 p[dim].prezzo = float.Parse(PREZZO.Text);
                 p[dim].quantita = 1;
+                p[dim].CodProdotto = codProd;
+                p[dim].eliminato = false;
+
+                FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                BinaryWriter f_out = new BinaryWriter(f_in_out);
+
+                riga = NOME.Text.PadRight(30) + PREZZO.Text.PadRight(30) + Convert.ToString(p[dim].quantita).PadRight(4);
+                strInByte = Encoding.Default.GetBytes(riga);
+                f_out.BaseStream.Seek((p[dim].CodProdotto - 1) * size, SeekOrigin.Begin);
+                f_out.Write(strInByte);
+
+                f_out.Close();
+                f_in_out.Close();
+
+                codProd++;
                 dim++;
                 //MessageBox.Show($"Il prodotto {NOME.Text} al prezzo di {PREZZO.Text} euro è stato aggiunto al carrello");
                 NOME.Text = "";
@@ -201,6 +217,7 @@ namespace CRUDAccessoDiretto
                 Array.Resize(ref p, p.Length - 1);
                 dim--;
                 AggiornaLista();
+                
                 if (dim == 0)
                 {
                     UPDATE.Enabled = false;
@@ -231,11 +248,29 @@ namespace CRUDAccessoDiretto
 
         public void AggiornaLista() 
         {
+            FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            BinaryReader f_in = new BinaryReader(f_in_out);
             LISTA.Items.Clear();
+            riga = Nome.PadRight(30) + Prezzo.ToString().PadRight(30) + Convert.ToString(Quantita).PadRight(4);
+            byte[] br;
+            f_in.BaseStream.Seek(0, SeekOrigin.Begin);
+
             for (int i = 0; i < dim; i++)
-            {
-                LISTA.Items.Add($"{p[i].nome};{p[i].prezzo}euro;{p[i].quantita}");
+            {       
+                br = f_in.ReadBytes(30);
+                Nome = Encoding.ASCII.GetString(br, 0, br.Length);
+                if (Nome[0] != '@')
+                {        
+                    br = f_in.ReadBytes(30);
+                    Prezzo = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                    br = f_in.ReadBytes(4);
+                    Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                    LISTA.Items.Add($"{Nome.Trim()};{Prezzo.ToString().Trim()}euro;{Quantita.ToString().Trim()};{p[i].CodProdotto}");
+                }               
             }
+            Nome = "@"; Prezzo = 0; Quantita = 0;
+            f_in.Close();
+            f_in_out.Close();
         }
         public bool ControlloInserimento(string nome, string prezzo)
         {
@@ -272,10 +307,13 @@ namespace CRUDAccessoDiretto
         {
             FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
             BinaryWriter f_out = new BinaryWriter(f_in_out);
-            riga = Nome.PadRight(30) + Prezzo.PadRight(30) + (Quantita.ToString()).PadRight(4);
+            riga = Nome.PadRight(30) + Prezzo.ToString().PadRight(30) + (Quantita.ToString()).PadRight(4);
             strInByte = Encoding.Default.GetBytes(riga);
             for (int i = 1; i <= 100; i++)
                 f_out.Write(strInByte);  
+
+            f_out.Close();
+            f_in_out.Close();
         }
     }
 }
