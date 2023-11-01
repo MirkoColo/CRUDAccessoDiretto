@@ -33,6 +33,7 @@ namespace CRUDAccessoDiretto
         public int NumeroRecord;
         public string riga;
         public byte[] strInByte;
+
         public Form1()
         {
             InitializeComponent();
