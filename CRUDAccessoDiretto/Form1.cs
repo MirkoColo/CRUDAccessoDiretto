@@ -17,14 +17,12 @@ namespace CRUDAccessoDiretto
         public struct Prodotto
         {
             public string nome;
-            public float prezzo;
             public int quantita;
             public int CodProdotto;
-            public bool eliminato;
+            public bool cancellato;
         }
         public Prodotto[] p;
         public int dim;
-        public int quanti = 1;
         public int codProd = 1;
         bool Confermadelete = false;
         bool Confermaupdate = false;
@@ -35,7 +33,7 @@ namespace CRUDAccessoDiretto
         public int NumeroRecord;
         public string riga;
         public byte[] strInByte;
-
+        
         public Form1()
         {
             InitializeComponent();
@@ -78,10 +76,9 @@ namespace CRUDAccessoDiretto
                 //if (ControlloQuantita(NOME.Text, float.Parse(PREZZO.Text)) == false)
                 Array.Resize(ref p, p.Length + 1);
                 p[dim].nome = NOME.Text;
-                p[dim].prezzo = float.Parse(PREZZO.Text);
                 p[dim].quantita = 1;
                 p[dim].CodProdotto = codProd;
-                p[dim].eliminato = false;
+                p[dim].cancellato = false;
 
                 FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 BinaryWriter f_out = new BinaryWriter(f_in_out);
@@ -94,6 +91,7 @@ namespace CRUDAccessoDiretto
                 f_out.Close();
                 f_in_out.Close();
 
+                Nome = "@"; Prezzo = 0; Quantita = 0;
                 codProd++;
                 dim++;
                 //MessageBox.Show($"Il prodotto {NOME.Text} al prezzo di {PREZZO.Text} euro è stato aggiunto al carrello");
@@ -142,7 +140,6 @@ namespace CRUDAccessoDiretto
             {
                 int indiceLista = LISTA.SelectedIndex;
                 p[indiceLista].nome = NOME.Text;
-                p[indiceLista].prezzo = float.Parse(PREZZO.Text);
                 AggiornaLista();
                 ConfermaUpdate.Enabled = false;
                 NOME.Text = "";
@@ -171,7 +168,7 @@ namespace CRUDAccessoDiretto
 
         
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e) //QUANTITA BUTTON
         {
             MessageBox.Show("Selezionare il prodotto di cui si vuole cambiare la quantità");
             ConfermaQuantita = true;
@@ -209,15 +206,27 @@ namespace CRUDAccessoDiretto
             if (Confermadelete == true)
             {
                 Confermadelete = false;
-                for (int i = LISTA.SelectedIndex; i < p.Length - 1; i++)
+                /*for (int i = LISTA.SelectedIndex; i < p.Length - 1; i++)
                 {
                     p[i].nome = p[i + 1].nome;
-                    p[i].prezzo = p[i + 1].prezzo;
                 }
                 Array.Resize(ref p, p.Length - 1);
-                dim--;
+                dim--;               
+                */
+                p[LISTA.SelectedIndex].cancellato = false;
+                FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                BinaryWriter f_out = new BinaryWriter(f_in_out);
+
+                riga = Nome.PadRight(30) + Prezzo.ToString().PadRight(30) + Quantita.ToString().PadRight(4);
+                strInByte = Encoding.Default.GetBytes(riga);
+                f_out.BaseStream.Seek((p[LISTA.SelectedIndex].CodProdotto - 1) * size, 0);
+                f_out.Write(strInByte);
+
+                f_out.Close();
+                f_in_out.Close();
+
                 AggiornaLista();
-                
+
                 if (dim == 0)
                 {
                     UPDATE.Enabled = false;
@@ -259,12 +268,12 @@ namespace CRUDAccessoDiretto
             {       
                 br = f_in.ReadBytes(30);
                 Nome = Encoding.ASCII.GetString(br, 0, br.Length);
+                br = f_in.ReadBytes(30);
+                Prezzo = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                br = f_in.ReadBytes(4);
+                Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
                 if (Nome[0] != '@')
-                {        
-                    br = f_in.ReadBytes(30);
-                    Prezzo = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
-                    br = f_in.ReadBytes(4);
-                    Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                {                         
                     LISTA.Items.Add($"{Nome.Trim()};{Prezzo.ToString().Trim()}euro;{Quantita.ToString().Trim()};{p[i].CodProdotto}");
                 }               
             }
