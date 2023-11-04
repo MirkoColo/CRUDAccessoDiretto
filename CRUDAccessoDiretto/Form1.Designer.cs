@@ -39,6 +39,8 @@
             this.QUANTITA = new System.Windows.Forms.Button();
             this.piuQ = new System.Windows.Forms.Button();
             this.menoQ = new System.Windows.Forms.Button();
+            this.ConfermaUp = new System.Windows.Forms.Button();
+            this.ESCI = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LISTA
@@ -152,11 +154,34 @@
             this.menoQ.UseVisualStyleBackColor = true;
             this.menoQ.Click += new System.EventHandler(this.menoQ_Click);
             // 
+            // ConfermaUp
+            // 
+            this.ConfermaUp.Location = new System.Drawing.Point(222, 315);
+            this.ConfermaUp.Margin = new System.Windows.Forms.Padding(4);
+            this.ConfermaUp.Name = "ConfermaUp";
+            this.ConfermaUp.Size = new System.Drawing.Size(195, 60);
+            this.ConfermaUp.TabIndex = 12;
+            this.ConfermaUp.Text = "Conferma Update";
+            this.ConfermaUp.UseVisualStyleBackColor = true;
+            this.ConfermaUp.Click += new System.EventHandler(this.ConfermaUp_Click);
+            // 
+            // ESCI
+            // 
+            this.ESCI.Location = new System.Drawing.Point(502, 583);
+            this.ESCI.Name = "ESCI";
+            this.ESCI.Size = new System.Drawing.Size(97, 52);
+            this.ESCI.TabIndex = 13;
+            this.ESCI.Text = "ESCI";
+            this.ESCI.UseVisualStyleBackColor = true;
+            this.ESCI.Click += new System.EventHandler(this.ESCI_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1744, 807);
+            this.Controls.Add(this.ESCI);
+            this.Controls.Add(this.ConfermaUp);
             this.Controls.Add(this.menoQ);
             this.Controls.Add(this.piuQ);
             this.Controls.Add(this.QUANTITA);
@@ -189,6 +214,8 @@
         private System.Windows.Forms.Button QUANTITA;
         private System.Windows.Forms.Button piuQ;
         private System.Windows.Forms.Button menoQ;
+        private System.Windows.Forms.Button ConfermaUp;
+        private System.Windows.Forms.Button ESCI;
     }
 }
 

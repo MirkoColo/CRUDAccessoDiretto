@@ -18,20 +18,14 @@ namespace CRUDAccessoDiretto
         public struct Prodotto
         {
             public string nome;
-            public int quantita;
             public int CodProdotto;
-            public bool cancellato;
         }
         public Prodotto[] p;
         public int dim;
         public int dim1 = 0;
         public int codProd = 1;
-        bool Confermadelete = false;
-        bool Confermaupdate = false;
-        bool ConfermaQuantita = false;
         public string cancellazione = ""; //f-fisica ; l-logica
-        public int indiceCanc = -1;
-        public int indiceQ = -1;
+        public int indice = -1;
         public int[] CodProdotto;
         public string Nome = "@"; public int Prezzo = 0; public int Quantita = 0; public int Cancellato = 0;  // campi per record vuoto
         public int size = 64;  // lunghezza (30+30+4) del record PREFISSATA
@@ -48,9 +42,9 @@ namespace CRUDAccessoDiretto
             DELETE.Enabled = false;
             UPDATE.Enabled = false;
             QUANTITA.Enabled = false;
+            ConfermaUp.Enabled = false;
             piuQ.Enabled = false;
             menoQ.Enabled = false;
-            ConfermaUpdate.Enabled = false;
             CreaFile();
             
         }
@@ -80,9 +74,7 @@ namespace CRUDAccessoDiretto
             {
                 Array.Resize(ref p, p.Length + 1);
                 p[dim].nome = NOME.Text;
-                p[dim].quantita = 1;
                 p[dim].CodProdotto = codProd;
-                p[dim].cancellato = false;
 
                 FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
                 BinaryWriter f_out = new BinaryWriter(f_in_out);
@@ -116,15 +108,23 @@ namespace CRUDAccessoDiretto
 
         private void UPDATE_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Selezionare il prodotto da cancellare e poi Inserire il nome e il prezzo del nuovo prodotto");
-            Confermaupdate = true;
-            CREATE.Enabled = false;
-            UPDATE.Enabled = false;
-            DELETE.Enabled = false; 
-            ConfermaUpdate.Enabled = true;
+            InputU();
+            if (indice == -1)
+            {
+                MessageBox.Show("Il prodotto che si vuole cambiare non è stato trovato");
+            }
+            else
+            {
+                ConfermaUp.Enabled = true;
+                QUANTITA.Enabled = false;
+                CREATE.Enabled = false;
+                UPDATE.Enabled = false;
+                DELETE.Enabled = false;
+
+            }
         }
 
-        private void ConfermaUpdate_Click(object sender, EventArgs e)
+        private void ConfermaUp_Click(object sender, EventArgs e)
         {
             bool controllo = ControlloInserimento(NOME.Text, PREZZO.Text);
 
@@ -142,15 +142,29 @@ namespace CRUDAccessoDiretto
             }
             else if (controllo == true)
             {
-                int indiceLista = LISTA.SelectedIndex;
-                p[indiceLista].nome = NOME.Text;
+                p[indice].nome = NOME.Text;
+                FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                BinaryWriter f_out = new BinaryWriter(f_in_out);
+
+                riga = NOME.Text.PadRight(30) + PREZZO.Text.ToString().PadRight(30);
+                strInByte = Encoding.Default.GetBytes(riga);
+                f_out.BaseStream.Seek((p[indice].CodProdotto - 1) * size, SeekOrigin.Begin);
+                f_out.Write(strInByte);
+
+                f_out.Close();
+                f_in_out.Close();
+
+                Nome = "@"; Prezzo = 0;
+
                 AggiornaLista();
-                ConfermaUpdate.Enabled = false;
                 NOME.Text = "";
                 PREZZO.Text = "";
                 CREATE.Enabled = true;
                 UPDATE.Enabled = true;
                 DELETE.Enabled = true;
+                ConfermaUp.Enabled = false;
+                QUANTITA.Enabled = true;
+                indice = -1;
             }
             else
             {
@@ -160,11 +174,16 @@ namespace CRUDAccessoDiretto
             }
         }
 
+        private void ConfermaUpdate_Click(object sender, EventArgs e)
+        {
+           
+        }
+
         private void DELETE_Click(object sender, EventArgs e)
         {
 
             InputDelete();
-            if (indiceCanc == -1)
+            if (indice == -1)
             {
                 MessageBox.Show("Il prodotto da cancellare non è stato trovato");
             }
@@ -173,38 +192,33 @@ namespace CRUDAccessoDiretto
                 InputCancellazione();
                 if (cancellazione == "l" || cancellazione == "f")
                 {
-                    Confermadelete = true;
                     CREATE.Enabled = false;
                     UPDATE.Enabled = false;
-                    QUANTITA.Enabled = false;
-                    ConfermaUpdate.Enabled = false;
                     dim1--;
                     FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
                     BinaryWriter f_out = new BinaryWriter(f_in_out);
 
                     if (cancellazione == "f")
                     {
-                        p[indiceCanc].nome = "";
-                        p[indiceCanc].cancellato = true;
+                        p[indice].nome = "";
                         riga = Nome.PadRight(30) + Prezzo.ToString().PadRight(30) + Convert.ToString(Quantita).PadRight(2) + Convert.ToString(Cancellato).PadRight(2);
                         strInByte = Encoding.Default.GetBytes(riga);
 
-                        f_out.BaseStream.Seek((p[indiceCanc].CodProdotto - 1) * size, 0);
+                        f_out.BaseStream.Seek((p[indice].CodProdotto - 1) * size, 0);
                         f_out.Write(strInByte);
 
                         f_out.Close();
                         f_in_out.Close();
-                        indiceCanc = -1;
+                        indice = -1;
                         AggiornaLista();
                     }
                     if (cancellazione == "l")
                     {
-                        p[indiceCanc].cancellato = true;
 
                         string a = "1".PadRight(2);
                         strInByte = Encoding.Default.GetBytes(a);
 
-                        f_out.BaseStream.Seek((p[indiceCanc].CodProdotto - 1) * size + 62, SeekOrigin.Begin);
+                        f_out.BaseStream.Seek((p[indice].CodProdotto - 1) * size + 62, SeekOrigin.Begin);
                         f_out.Write(strInByte);
 
                         f_out.Close();
@@ -218,6 +232,7 @@ namespace CRUDAccessoDiretto
                         UPDATE.Enabled = false;
                         DELETE.Enabled = false;
                         CREATE.Enabled = true;
+                        QUANTITA.Enabled = false;
                     }
                     else
                     {
@@ -237,7 +252,7 @@ namespace CRUDAccessoDiretto
         {
             
             InputQ();
-            if (indiceQ == -1)
+            if (indice == -1)
             {
                 MessageBox.Show("Il prodotto di cui si vuole cambiare la quantità non è stato trovato");
             }
@@ -251,18 +266,20 @@ namespace CRUDAccessoDiretto
                 menoQ.Enabled = true;
             }
         }
+
+        //SOMMA 1 ALLA QUANTITA DI UN PRODOTTO
         private void piuQ_Click(object sender, EventArgs e)
         {
             FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
             BinaryWriter f_out = new BinaryWriter(f_in_out);
             BinaryReader f_in = new BinaryReader(f_in_out);
             byte[] br;
-            f_in.BaseStream.Seek((p[indiceQ].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
+            f_in.BaseStream.Seek((p[indice].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
             br = f_in.ReadBytes(2);
             Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length)) + 1;
             strInByte = Encoding.Default.GetBytes(Quantita.ToString().PadRight(2));
 
-            f_out.BaseStream.Seek((p[indiceQ].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
+            f_out.BaseStream.Seek((p[indice].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
             f_out.Write(strInByte);
 
             f_in.Close();
@@ -276,8 +293,10 @@ namespace CRUDAccessoDiretto
             UPDATE.Enabled = true;
             DELETE.Enabled = true;
             QUANTITA.Enabled = true;
-            indiceQ = -1;
+            indice = -1;
         }
+
+        //SOTTRAE 1 ALLA QUANTITA DI UN PRODOTTO
 
         private void menoQ_Click(object sender, EventArgs e)
         {
@@ -285,12 +304,12 @@ namespace CRUDAccessoDiretto
             BinaryReader f_in = new BinaryReader(f_in_out);
             BinaryWriter f_out = new BinaryWriter(f_in_out);
             byte[] br;
-            f_in.BaseStream.Seek((p[indiceQ].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
+            f_in.BaseStream.Seek((p[indice].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
             br = f_in.ReadBytes(2);       
             Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
             if (Quantita > 1)
             {
-                f_in.BaseStream.Seek((p[indiceQ].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
+                f_in.BaseStream.Seek((p[indice].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
                 strInByte = Encoding.Default.GetBytes((Quantita - 1).ToString().PadRight(2));              
                 f_out.Write(strInByte);      
             }
@@ -304,13 +323,14 @@ namespace CRUDAccessoDiretto
             UPDATE.Enabled = true;
             DELETE.Enabled = true;
             QUANTITA.Enabled = true;
-            indiceQ = -1;
+            indice = -1;
         }
 
         private void LISTA_SelectedIndexChanged(object sender, EventArgs e)
         {
                        
         }
+
         //FUNZIONI DI SERVIZIO
 
         public void AggiornaLista() 
@@ -372,6 +392,7 @@ namespace CRUDAccessoDiretto
         }
         */
 
+        //CREAZIONE DEL FILE DI BASE QUANDO VIENE AVVIATO IL PROGRAMMA
         public void CreaFile()
         {
             FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
@@ -397,7 +418,7 @@ namespace CRUDAccessoDiretto
             defaultValue = "";
             do
             {
-                cancellazione = Interaction.InputBox(message, title, defaultValue);
+                cancellazione = Interaction.InputBox(message, title, defaultValue).ToLower();
                 if (cancellazione == "")
                 {
                     controllo = true;
@@ -434,7 +455,7 @@ namespace CRUDAccessoDiretto
             {
                 if (p[i].nome == prodotto)
                 {
-                    indiceCanc = i;
+                    indice = i;
                 }
             }
         }
@@ -450,10 +471,30 @@ namespace CRUDAccessoDiretto
             {
                 if (p[i].nome == prodotto)
                 {
-                    indiceQ = i;
+                    indice = i;
                 }
             }
         }
 
+        public void InputU()
+        {
+            string message, title, defaultValue;
+            message = "Inserire il nome del prodotto che si vuole cambiare";
+            title = "Input Update";
+            defaultValue = "";
+            string prodotto = Interaction.InputBox(message, title, defaultValue);
+            for (int i = 0; i < dim; i++)
+            {
+                if (p[i].nome == prodotto)
+                {
+                    indice = i;
+                }
+            }
+        }
+
+        private void ESCI_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
     }    
 }
