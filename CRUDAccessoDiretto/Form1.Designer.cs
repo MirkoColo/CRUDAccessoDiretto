@@ -33,7 +33,6 @@
             this.PREZZO = new System.Windows.Forms.TextBox();
             this.No = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.ConfermaUpdate = new System.Windows.Forms.Button();
             this.UPDATE = new System.Windows.Forms.Button();
             this.DELETE = new System.Windows.Forms.Button();
             this.CREATE = new System.Windows.Forms.Button();
@@ -47,7 +46,7 @@
             this.LISTA.FormattingEnabled = true;
             this.LISTA.ItemHeight = 16;
             this.LISTA.Location = new System.Drawing.Point(795, 119);
-            this.LISTA.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.LISTA.Margin = new System.Windows.Forms.Padding(4);
             this.LISTA.Name = "LISTA";
             this.LISTA.Size = new System.Drawing.Size(725, 516);
             this.LISTA.TabIndex = 0;
@@ -56,7 +55,7 @@
             // NOME
             // 
             this.NOME.Location = new System.Drawing.Point(220, 191);
-            this.NOME.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.NOME.Margin = new System.Windows.Forms.Padding(4);
             this.NOME.Name = "NOME";
             this.NOME.Size = new System.Drawing.Size(193, 22);
             this.NOME.TabIndex = 1;
@@ -64,7 +63,7 @@
             // PREZZO
             // 
             this.PREZZO.Location = new System.Drawing.Point(220, 256);
-            this.PREZZO.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.PREZZO.Margin = new System.Windows.Forms.Padding(4);
             this.PREZZO.Name = "PREZZO";
             this.PREZZO.Size = new System.Drawing.Size(193, 22);
             this.PREZZO.TabIndex = 2;
@@ -90,21 +89,10 @@
             this.label2.Text = "Prezzo";
             this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
-            // ConfermaUpdate
-            // 
-            this.ConfermaUpdate.Location = new System.Drawing.Point(220, 315);
-            this.ConfermaUpdate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.ConfermaUpdate.Name = "ConfermaUpdate";
-            this.ConfermaUpdate.Size = new System.Drawing.Size(195, 60);
-            this.ConfermaUpdate.TabIndex = 5;
-            this.ConfermaUpdate.Text = "Conferma Update";
-            this.ConfermaUpdate.UseVisualStyleBackColor = true;
-            this.ConfermaUpdate.Click += new System.EventHandler(this.ConfermaUpdate_Click);
-            // 
             // UPDATE
             // 
             this.UPDATE.Location = new System.Drawing.Point(452, 315);
-            this.UPDATE.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.UPDATE.Margin = new System.Windows.Forms.Padding(4);
             this.UPDATE.Name = "UPDATE";
             this.UPDATE.Size = new System.Drawing.Size(195, 60);
             this.UPDATE.TabIndex = 6;
@@ -115,7 +103,7 @@
             // DELETE
             // 
             this.DELETE.Location = new System.Drawing.Point(452, 412);
-            this.DELETE.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.DELETE.Margin = new System.Windows.Forms.Padding(4);
             this.DELETE.Name = "DELETE";
             this.DELETE.Size = new System.Drawing.Size(195, 60);
             this.DELETE.TabIndex = 7;
@@ -126,7 +114,7 @@
             // CREATE
             // 
             this.CREATE.Location = new System.Drawing.Point(452, 214);
-            this.CREATE.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.CREATE.Margin = new System.Windows.Forms.Padding(4);
             this.CREATE.Name = "CREATE";
             this.CREATE.Size = new System.Drawing.Size(195, 60);
             this.CREATE.TabIndex = 8;
@@ -175,13 +163,12 @@
             this.Controls.Add(this.CREATE);
             this.Controls.Add(this.DELETE);
             this.Controls.Add(this.UPDATE);
-            this.Controls.Add(this.ConfermaUpdate);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.No);
             this.Controls.Add(this.PREZZO);
             this.Controls.Add(this.NOME);
             this.Controls.Add(this.LISTA);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -196,7 +183,6 @@
         private System.Windows.Forms.TextBox PREZZO;
         private System.Windows.Forms.Label No;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button ConfermaUpdate;
         private System.Windows.Forms.Button UPDATE;
         private System.Windows.Forms.Button DELETE;
         private System.Windows.Forms.Button CREATE;

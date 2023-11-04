@@ -31,6 +31,7 @@ namespace CRUDAccessoDiretto
         bool ConfermaQuantita = false;
         public string cancellazione = ""; //f-fisica ; l-logica
         public int indiceCanc = -1;
+        public int indiceQ = -1;
         public int[] CodProdotto;
         public string Nome = "@"; public int Prezzo = 0; public int Quantita = 0; public int Cancellato = 0;  // campi per record vuoto
         public int size = 64;  // lunghezza (30+30+4) del record PREFISSATA
@@ -232,55 +233,83 @@ namespace CRUDAccessoDiretto
         }
 
 
-
-            private void button1_Click(object sender, EventArgs e) //QUANTITA BUTTON
+        private void button1_Click(object sender, EventArgs e) //QUANTITA BUTTON
         {
-            MessageBox.Show("Selezionare il prodotto di cui si vuole cambiare la quantità");
-            ConfermaQuantita = true;
-            CREATE.Enabled = false;
-            UPDATE.Enabled = false;
-            DELETE.Enabled = false;
+            
+            InputQ();
+            if (indiceQ == -1)
+            {
+                MessageBox.Show("Il prodotto di cui si vuole cambiare la quantità non è stato trovato");
+            }
+            else
+            {
+                QUANTITA.Enabled = false;
+                CREATE.Enabled = false;
+                UPDATE.Enabled = false;
+                DELETE.Enabled = false;
+                piuQ.Enabled = true;
+                menoQ.Enabled = true;
+            }
         }
         private void piuQ_Click(object sender, EventArgs e)
         {
-            p[LISTA.SelectedIndex].quantita += 1;
+            FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            BinaryWriter f_out = new BinaryWriter(f_in_out);
+            BinaryReader f_in = new BinaryReader(f_in_out);
+            byte[] br;
+            f_in.BaseStream.Seek((p[indiceQ].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
+            br = f_in.ReadBytes(2);
+            Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length)) + 1;
+            strInByte = Encoding.Default.GetBytes(Quantita.ToString().PadRight(2));
+
+            f_out.BaseStream.Seek((p[indiceQ].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
+            f_out.Write(strInByte);
+
+            f_in.Close();
+            f_out.Close();
+            f_in_out.Close();
+
             AggiornaLista();
             piuQ.Enabled = false;
             menoQ.Enabled = false;
             CREATE.Enabled = true;
             UPDATE.Enabled = true;
             DELETE.Enabled = true;
+            QUANTITA.Enabled = true;
+            indiceQ = -1;
         }
 
         private void menoQ_Click(object sender, EventArgs e)
         {
-            if (p[LISTA.SelectedIndex].quantita != 1)
+            FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            BinaryReader f_in = new BinaryReader(f_in_out);
+            BinaryWriter f_out = new BinaryWriter(f_in_out);
+            byte[] br;
+            f_in.BaseStream.Seek((p[indiceQ].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
+            br = f_in.ReadBytes(2);       
+            Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+            if (Quantita > 1)
             {
-                p[LISTA.SelectedIndex].quantita--;
-                AggiornaLista();              
+                f_in.BaseStream.Seek((p[indiceQ].CodProdotto - 1) * size + 60, SeekOrigin.Begin);
+                strInByte = Encoding.Default.GetBytes((Quantita - 1).ToString().PadRight(2));              
+                f_out.Write(strInByte);      
             }
-            menoQ.Enabled = false;
+            f_out.Close();
+            f_in.Close();
+            f_in_out.Close();
+            AggiornaLista();
             piuQ.Enabled = false;
+            menoQ.Enabled = false;
             CREATE.Enabled = true;
             UPDATE.Enabled = true;
             DELETE.Enabled = true;
+            QUANTITA.Enabled = true;
+            indiceQ = -1;
         }
 
         private void LISTA_SelectedIndexChanged(object sender, EventArgs e)
         {
                        
-            //UPDATE
-            if (Confermaupdate == true)
-            {
-                ConfermaUpdate.Enabled = true;
-                UPDATE.Enabled = false;
-            }
-            else if (ConfermaQuantita == true)
-            {
-                ConfermaQuantita = false;
-                piuQ.Enabled = true;
-                menoQ.Enabled = true;
-            }
         }
         //FUNZIONI DI SERVIZIO
 
@@ -410,6 +439,21 @@ namespace CRUDAccessoDiretto
             }
         }
 
+        public void InputQ()
+        {
+            string message, title, defaultValue;
+            message = "Inserire il nome del prodotto di cui si vuole cambiare la quantità";
+            title = "Input Quantità";
+            defaultValue = "";
+            string prodotto = Interaction.InputBox(message, title, defaultValue);
+            for (int i = 0; i < dim; i++)
+            {
+                if (p[i].nome == prodotto)
+                {
+                    indiceQ = i;
+                }
+            }
+        }
 
     }    
 }
