@@ -10,6 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
+using System.Diagnostics;
+using System.Reflection;
+using static CRUDAccessoDiretto.Form1;
 
 namespace CRUDAccessoDiretto
 {
@@ -26,7 +29,6 @@ namespace CRUDAccessoDiretto
         public int codProd = 1;
         public string cancellazione = ""; //f-fisica ; l-logica
         public int indice = -1;
-        public int[] CodProdotto;
         public string Nome = "@"; public int Prezzo = 0; public int Quantita = 0; public int Cancellato = 0;  // campi per record vuoto
         public int size = 64;  // lunghezza (30+30+4) del record PREFISSATA
         public int NumeroRecord;
@@ -38,15 +40,24 @@ namespace CRUDAccessoDiretto
             InitializeComponent();
             dim = 0;
             p = new Prodotto[dim];
-            CodProdotto = new int[dim];
             DELETE.Enabled = false;
             UPDATE.Enabled = false;
             QUANTITA.Enabled = false;
             ConfermaUp.Enabled = false;
             piuQ.Enabled = false;
             menoQ.Enabled = false;
-            CreaFile();
-            
+            if (File.Exists("Carrello.dat") == false)
+            {
+                CreaFile();
+            }
+            else
+            {
+                CaricaFile();
+                UPDATE.Enabled = true;
+                DELETE.Enabled = true;
+                QUANTITA.Enabled = true;
+            }
+
         }
 
         private void label2_Click(object sender, EventArgs e)
@@ -72,31 +83,42 @@ namespace CRUDAccessoDiretto
             }
             else if (controllo == true)
             {
-                Array.Resize(ref p, p.Length + 1);
-                p[dim].nome = NOME.Text;
-                p[dim].CodProdotto = codProd;
+                bool prodottoEsiste = ProdottoEsiste(NOME.Text);
 
-                FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                BinaryWriter f_out = new BinaryWriter(f_in_out);
+                if (prodottoEsiste == false)
+                {
+                    Array.Resize(ref p, p.Length + 1);
+                    p[dim].nome = NOME.Text;
+                    p[dim].CodProdotto = codProd;
 
-                riga = NOME.Text.PadRight(30) + PREZZO.Text.PadRight(30) + Convert.ToString(Quantita + 1).PadRight(2) + Convert.ToString(Cancellato).PadRight(2);
-                strInByte = Encoding.Default.GetBytes(riga);
-                f_out.BaseStream.Seek((p[dim].CodProdotto - 1) * size, SeekOrigin.Begin);
-                f_out.Write(strInByte);
+                    FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    BinaryWriter f_out = new BinaryWriter(f_in_out);
 
-                f_out.Close();
-                f_in_out.Close();
+                    riga = NOME.Text.PadRight(30) + PREZZO.Text.PadRight(30) + Convert.ToString(Quantita + 1).PadRight(2) + Convert.ToString(Cancellato).PadRight(2);
+                    strInByte = Encoding.Default.GetBytes(riga);
+                    f_out.BaseStream.Seek((p[dim].CodProdotto - 1) * size, SeekOrigin.Begin);
+                    f_out.Write(strInByte);
 
-                Nome = "@"; Prezzo = 0; Quantita = 0; Cancellato = 0;
-                codProd++;
-                dim++;
-                dim1++;
-                NOME.Text = "";
-                PREZZO.Text = "";
-                AggiornaLista();
-                UPDATE.Enabled = true;
-                DELETE.Enabled = true;
-                QUANTITA.Enabled = true;
+                    f_out.Close();
+                    f_in_out.Close();
+
+                    Nome = "@"; Prezzo = 0; Quantita = 0; Cancellato = 0;
+                    codProd++;
+                    dim++;
+                    dim1++;
+                    NOME.Text = "";
+                    PREZZO.Text = "";
+                    AggiornaLista();
+                    UPDATE.Enabled = true;
+                    DELETE.Enabled = true;
+                    QUANTITA.Enabled = true;
+                }
+                else
+                {
+                    MessageBox.Show("Il prodotto non è stato inserito");
+                    NOME.Text = "";
+                    PREZZO.Text = "";
+                }
             }
             else
             {
@@ -181,7 +203,6 @@ namespace CRUDAccessoDiretto
 
         private void DELETE_Click(object sender, EventArgs e)
         {
-
             InputDelete();
             if (indice == -1)
             {
@@ -200,7 +221,9 @@ namespace CRUDAccessoDiretto
 
                     if (cancellazione == "f")
                     {
+                        
                         p[indice].nome = "";
+                        Nome = "$";
                         riga = Nome.PadRight(30) + Prezzo.ToString().PadRight(30) + Convert.ToString(Quantita).PadRight(2) + Convert.ToString(Cancellato).PadRight(2);
                         strInByte = Encoding.Default.GetBytes(riga);
 
@@ -211,6 +234,8 @@ namespace CRUDAccessoDiretto
                         f_in_out.Close();
                         indice = -1;
                         AggiornaLista();
+                        Nome = "@";
+
                     }
                     if (cancellazione == "l")
                     {
@@ -250,9 +275,8 @@ namespace CRUDAccessoDiretto
 
         private void button1_Click(object sender, EventArgs e) //QUANTITA BUTTON
         {
-            
             InputQ();
-            if (indice == -1)
+            if (indice == -1 )
             {
                 MessageBox.Show("Il prodotto di cui si vuole cambiare la quantità non è stato trovato");
             }
@@ -352,7 +376,7 @@ namespace CRUDAccessoDiretto
                 Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
                 br = f_in.ReadBytes(2);
                 Cancellato = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
-                if (Nome[0] != '@' && Cancellato != 1)
+                if (Nome[0] != '@' && Cancellato != 1 && Nome[0] != '$')
                 {                         
                     LISTA.Items.Add($"{Nome.Trim()};{Prezzo.ToString().Trim()}euro;{Quantita.ToString().Trim()};{Cancellato.ToString().Trim()}");
                 }               
@@ -363,8 +387,17 @@ namespace CRUDAccessoDiretto
         }
         public bool ControlloInserimento(string nome, string prezzo)
         {
+            bool dollaro = false; //non c'è il dollaro nel nome
+            for(int i = 0; i < nome.Length; i++)
+            {
+                if (nome[i] == '$')
+                {
+                    dollaro = true;
+                }
+            }
+
             bool uscitaPrezzo = false;
-            if (prezzo.All(char.IsNumber))
+            if (prezzo.All(char.IsNumber) && dollaro == false)
             {
                 uscitaPrezzo = true;
             }
@@ -453,7 +486,7 @@ namespace CRUDAccessoDiretto
 
             for(int i = 0; i < dim; i++)
             {
-                if (p[i].nome == prodotto)
+                if (p[i].nome == prodotto && p[i].nome != "$")
                 {
                     indice = i;
                 }
@@ -469,7 +502,7 @@ namespace CRUDAccessoDiretto
             string prodotto = Interaction.InputBox(message, title, defaultValue);
             for (int i = 0; i < dim; i++)
             {
-                if (p[i].nome == prodotto)
+                if (p[i].nome == prodotto && p[i].nome != "$")
                 {
                     indice = i;
                 }
@@ -485,16 +518,76 @@ namespace CRUDAccessoDiretto
             string prodotto = Interaction.InputBox(message, title, defaultValue);
             for (int i = 0; i < dim; i++)
             {
-                if (p[i].nome == prodotto)
+                if (p[i].nome == prodotto && p[i].nome != "$")
                 {
                     indice = i;
                 }
             }
         }
 
+        public void CaricaFile()
+        {
+            //seek dim * size
+            FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            BinaryReader f_in = new BinaryReader(f_in_out);
+            byte[] br;
+            bool controllo = false;
+            f_in.BaseStream.Seek(0, SeekOrigin.Begin);
+
+            while (controllo == false)
+            {
+                br = f_in.ReadBytes(30);
+                Nome = Encoding.ASCII.GetString(br, 0, br.Length);
+                br = f_in.ReadBytes(30);
+                Prezzo = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                br = f_in.ReadBytes(2);
+                Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                br = f_in.ReadBytes(2);
+                Cancellato = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                if (Nome[0] == '@')
+                {
+                    controllo = true;
+                    break;
+                }
+                else
+                {
+                    Array.Resize(ref p, p.Length + 1);
+                    p[dim].nome = Nome.Trim();
+                    p[dim].CodProdotto = codProd;
+                    codProd++;
+                    dim++;
+                }
+            }
+            
+            f_in.Close();
+            f_in_out.Close();
+            AggiornaLista();
+
+        }
+
+        public bool ProdottoEsiste(string nom)
+        {
+            bool uscita = false;
+            for (int i = 0; i < dim; i++)
+            {
+                if (p[i].nome == nom)
+                {
+                    uscita = true;
+                    break;
+                }
+            }
+            return uscita;
+        }
         private void ESCI_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        //APRI FILE
+        private void VisualizzaFie_Click(object sender, EventArgs e)
+        {
+            string percorso = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Carrello.dat");
+            Process.Start(percorso);
         }
     }    
 }
