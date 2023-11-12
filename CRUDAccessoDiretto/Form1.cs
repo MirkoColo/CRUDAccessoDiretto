@@ -25,8 +25,8 @@ namespace CRUDAccessoDiretto
         }
         public Prodotto[] p;
         public int dim;
-        public int dim1 = 0;
         public int codProd = 1;
+        public int indiceCanc = -1;
         public string cancellazione = ""; //f-fisica ; l-logica
         public int indice = -1;
         public string Nome = "@"; public int Prezzo = 0; public int Quantita = 0; public int Cancellato = 0;  // campi per record vuoto
@@ -40,24 +40,18 @@ namespace CRUDAccessoDiretto
             InitializeComponent();
             dim = 0;
             p = new Prodotto[dim];
-            DELETE.Enabled = false;
-            UPDATE.Enabled = false;
-            QUANTITA.Enabled = false;
-            ConfermaUp.Enabled = false;
-            piuQ.Enabled = false;
-            menoQ.Enabled = false;
             if (File.Exists("Carrello.dat") == false)
             {
                 CreaFile();
+                
             }
             else
             {
                 CaricaFile();
-                UPDATE.Enabled = true;
-                DELETE.Enabled = true;
-                QUANTITA.Enabled = true;
             }
-
+            piuQ.Enabled = false;
+            menoQ.Enabled = false;
+            ConfermaUp.Enabled = false;
         }
 
         private void label2_Click(object sender, EventArgs e)
@@ -84,41 +78,44 @@ namespace CRUDAccessoDiretto
             else if (controllo == true)
             {
                 bool prodottoEsiste = ProdottoEsiste(NOME.Text);
-                int indiceCanc = RicercaCanc();
+                
                 
                 if (prodottoEsiste == false)
                 {
-                    Array.Resize(ref p, p.Length + 1);
-                    
+
+                    RicercaCanc();
                     FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
                     BinaryWriter f_out = new BinaryWriter(f_in_out);
                     if (indiceCanc == -1)
                     {
+                        Array.Resize(ref p, p.Length + 1);
                         p[dim].nome = NOME.Text;
                         p[dim].CodProdotto = codProd;
                         f_out.BaseStream.Seek((p[dim].CodProdotto - 1) * size, SeekOrigin.Begin);
+                        codProd++;
+                        dim++;
                     }
                     else
                     {
+                        for(int i = 0; i < dim; i++)
+                        {
+                            MessageBox.Show(p[i].nome);
+                        }
+                        MessageBox.Show(indiceCanc.ToString());
                         p[indiceCanc].nome = NOME.Text;
-                        p[indiceCanc].CodProdotto = codProd;
                         f_out.BaseStream.Seek((indiceCanc) * size, SeekOrigin.Begin);
+                        indiceCanc = -1;
                     }                   
                     riga = NOME.Text.PadRight(30) + PREZZO.Text.PadRight(30) + Convert.ToString(Quantita + 1).PadRight(2) + Convert.ToString(Cancellato).PadRight(2);
                     strInByte = Encoding.Default.GetBytes(riga);                
                     f_out.Write(strInByte);
                     f_out.Close();
                     f_in_out.Close();
-                    Nome = "@"; Prezzo = 0; Quantita = 0; Cancellato = 0;
-                    codProd++;
-                    dim++;
-                    dim1++;
+                    Nome = "@"; Prezzo = 0; Quantita = 0; Cancellato = 0;                 
                     NOME.Text = "";
                     PREZZO.Text = "";
                     AggiornaLista();
-                    UPDATE.Enabled = true;
-                    DELETE.Enabled = true;
-                    QUANTITA.Enabled = true;
+                    //OrdinamentoAlfabetico();
                 }
                 else
                 {
@@ -145,18 +142,17 @@ namespace CRUDAccessoDiretto
             else
             {
                 ConfermaUp.Enabled = true;
-                QUANTITA.Enabled = false;
                 CREATE.Enabled = false;
-                UPDATE.Enabled = false;
                 DELETE.Enabled = false;
-
+                QUANTITA.Enabled = false;
+                RECUPERA.Enabled = false;
             }
         }
 
         private void ConfermaUp_Click(object sender, EventArgs e)
         {
             bool controllo = ControlloInserimento(NOME.Text, PREZZO.Text);
-
+            bool prodottoEsiste = ProdottoEsiste(NOME.Text);
             if (NOME.Text == "" && PREZZO.Text == "")
             {
                 MessageBox.Show("Inserire il nome e il prezzo del nuovo prodotto");
@@ -169,7 +165,7 @@ namespace CRUDAccessoDiretto
             {
                 MessageBox.Show("Inserire il prezzo del nuovo prodotto");
             }
-            else if (controllo == true)
+            else if (controllo == true && prodottoEsiste == false)
             {
                 p[indice].nome = NOME.Text;
                 FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
@@ -188,12 +184,13 @@ namespace CRUDAccessoDiretto
                 AggiornaLista();
                 NOME.Text = "";
                 PREZZO.Text = "";
-                CREATE.Enabled = true;
-                UPDATE.Enabled = true;
-                DELETE.Enabled = true;
                 ConfermaUp.Enabled = false;
+                CREATE.Enabled = true;
+                DELETE.Enabled = true;
                 QUANTITA.Enabled = true;
+                RECUPERA.Enabled = true;
                 indice = -1;
+                //OrdinamentoAlfabetico();
             }
             else
             {
@@ -220,9 +217,6 @@ namespace CRUDAccessoDiretto
                 InputCancellazione();
                 if (cancellazione == "l" || cancellazione == "f")
                 {
-                    CREATE.Enabled = false;
-                    UPDATE.Enabled = false;
-                    dim1--;
                     FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
                     BinaryWriter f_out = new BinaryWriter(f_in_out);
 
@@ -260,21 +254,6 @@ namespace CRUDAccessoDiretto
                         AggiornaLista();
 
                     }
-                    if (dim1 <= 0)
-                    {
-                        UPDATE.Enabled = false;
-                        DELETE.Enabled = false;
-                        CREATE.Enabled = true;
-                        QUANTITA.Enabled = false;
-                    }
-                    else
-                    {
-                        CREATE.Enabled = true;
-                        UPDATE.Enabled = true;
-                        DELETE.Enabled = true;
-                    }
-
-
                 }
             }
             
@@ -290,10 +269,6 @@ namespace CRUDAccessoDiretto
             }
             else
             {
-                QUANTITA.Enabled = false;
-                CREATE.Enabled = false;
-                UPDATE.Enabled = false;
-                DELETE.Enabled = false;
                 piuQ.Enabled = true;
                 menoQ.Enabled = true;
             }
@@ -321,10 +296,6 @@ namespace CRUDAccessoDiretto
             AggiornaLista();
             piuQ.Enabled = false;
             menoQ.Enabled = false;
-            CREATE.Enabled = true;
-            UPDATE.Enabled = true;
-            DELETE.Enabled = true;
-            QUANTITA.Enabled = true;
             indice = -1;
         }
 
@@ -351,11 +322,96 @@ namespace CRUDAccessoDiretto
             AggiornaLista();
             piuQ.Enabled = false;
             menoQ.Enabled = false;
-            CREATE.Enabled = true;
-            UPDATE.Enabled = true;
-            DELETE.Enabled = true;
             QUANTITA.Enabled = true;
             indice = -1;
+        }
+
+        private void RECUPERA_Click(object sender, EventArgs e)
+        {
+            string message, title, defaultValue;
+            message = "Inserire il nome del prodotto che si vuole recuperare(";
+            title = "Input Recupero";
+            defaultValue = "";
+
+            FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            BinaryReader f_in = new BinaryReader(f_in_out);
+            byte[] br;
+            string[] ar = new string[0];
+            int l = 0;
+            f_in.BaseStream.Seek(0, SeekOrigin.Begin);
+            for (int i = 0; i < dim; i++)
+            {
+                br = f_in.ReadBytes(30);
+                Nome = Encoding.ASCII.GetString(br, 0, br.Length);
+                br = f_in.ReadBytes(30);
+                Prezzo = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                br = f_in.ReadBytes(2);
+                Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                br = f_in.ReadBytes(2);
+                Cancellato = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                if (Cancellato == 1)
+                {
+                    Array.Resize(ref ar, ar.Length + 1);
+                    ar[l] = Nome.Trim();
+                    l++;
+                    message += Nome.Trim() + ";";
+                }
+            }
+            message += ")";
+            if (l == 0)
+            {
+                MessageBox.Show("Non ci sono prodotti da recuperare");
+            }
+            else
+            {
+                string prodotto = Interaction.InputBox(message, title, defaultValue);
+                int ind = -1;
+                for (int i = 0; i < l; i++)
+                {
+                    if (ar[i] == prodotto)
+                    {
+                        ind = i;
+                        break;
+                    }
+                }
+                if (ind == -1)
+                {
+                    MessageBox.Show("Non è stato trovato il prodotto da recuperare");
+                }
+                else
+                {
+                    bool uscita = false;
+                    BinaryWriter f_out = new BinaryWriter(f_in_out);
+                    f_in.BaseStream.Seek(0, SeekOrigin.Begin);
+                    while (uscita == false)
+                    {
+
+                        br = f_in.ReadBytes(30);
+                        Nome = Encoding.ASCII.GetString(br, 0, br.Length);
+                        br = f_in.ReadBytes(30);
+                        Prezzo = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                        br = f_in.ReadBytes(2);
+                        Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                        if (Nome.Trim() == prodotto)
+                        {
+                            string a = "0".PadRight(2);
+                            strInByte = Encoding.Default.GetBytes(a);
+                            f_out.Write(strInByte);
+                            uscita = true;
+                        }
+                        else
+                        {
+                            br = f_in.ReadBytes(2);
+                            Cancellato = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                        }
+                    }
+                    f_out.Close();
+
+                }
+            }
+            f_in.Close();
+            f_in_out.Close();
+            AggiornaLista();
         }
 
         private void LISTA_SelectedIndexChanged(object sender, EventArgs e)
@@ -386,7 +442,7 @@ namespace CRUDAccessoDiretto
                 Cancellato = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
                 if (Nome[0] != '@' && Cancellato != 1 && Nome[0] != '$')
                 {                         
-                    LISTA.Items.Add($"{Nome.Trim()};{Prezzo.ToString().Trim()}euro;{Quantita.ToString().Trim()};{Cancellato.ToString().Trim()}");
+                    LISTA.Items.Add($"{Nome.Trim()};{Prezzo.ToString().Trim()}euro;{Quantita.ToString().Trim()}");
                 }               
             }
             Nome = "@"; Prezzo = 0; Quantita = 0; Cancellato = 0;
@@ -499,6 +555,7 @@ namespace CRUDAccessoDiretto
             f_in.BaseStream.Seek(0, SeekOrigin.Begin);
             for (int i = 0; i < dim; i++)
             {
+                
                 br = f_in.ReadBytes(30);
                 Nome = Encoding.ASCII.GetString(br, 0, br.Length);
                 br = f_in.ReadBytes(30);
@@ -600,45 +657,21 @@ namespace CRUDAccessoDiretto
 
         public void CaricaFile()
         {
-            
-            FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            BinaryReader f_in = new BinaryReader(f_in_out);
-            byte[] br;
-            bool controllo = false;
-            f_in.BaseStream.Seek(0, SeekOrigin.Begin);
-
-            while (controllo == false)
+            StreamReader sr = new StreamReader(@"struct.txt");
+            string line = sr.ReadLine();
+           while(line != null)
             {
-                br = f_in.ReadBytes(30);
-                Nome = Encoding.ASCII.GetString(br, 0, br.Length);
-                br = f_in.ReadBytes(30);
-                Prezzo = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
-                br = f_in.ReadBytes(2);
-                Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
-                br = f_in.ReadBytes(2);
-                Cancellato = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
-                if (Nome[0] == '@')
-                {
-                    controllo = true;
-                    break;
-                }
-                else
-                {
-                    Array.Resize(ref p, p.Length + 1);
-                    p[dim].nome = Nome.Trim();
-                    p[dim].CodProdotto = codProd;
-                    codProd++;
-                    dim++;
-                    if (Cancellato == 0)
-                    {
-                        dim1++;
-                    }
-                }
+                Array.Resize(ref p, p.Length + 1);
+                string[] arrSplit = Split(line);
+                p[dim].nome = arrSplit[0];
+                p[dim].CodProdotto = int.Parse(arrSplit[1]);
+                codProd++;
+                dim++;
+                line = sr.ReadLine();
             }
-            
-            f_in.Close();
-            f_in_out.Close();
 
+
+            //OrdinamentoAlfabetico();
             AggiornaLista();
 
         }
@@ -700,20 +733,97 @@ namespace CRUDAccessoDiretto
 
         }
 
-        public int RicercaCanc()
+        public void RicercaCanc()
         {
-            int indice = -1;
 
             for(int i = 0; i < dim; i++)
             {
                 if (p[i].nome == "@")
                 {
-                    indice = i;
+                    indiceCanc = i;
+                    break;
+                }
+            }
+        }
+        
+        /*
+        public void OrdinamentoAlfabetico()
+        {
+            for(int i = 0; i < dim; i++)
+            {
+                for(int j = i + 1; j < dim; j++)
+                {
+                    if (p[i].nome.CompareTo(p[j].nome) > 0)
+                    {
+                        string a = p[i].nome;
+                        p[i].nome = p[j].nome;
+                        p[j].nome = a;
+                        int b = p[i].CodProdotto;
+                        p[i].CodProdotto = p[j].CodProdotto;
+                        p[j].CodProdotto = b;
+
+                    }
+                }
+            }
+        }
+        */
+
+        
+
+        static string[] Split(string stringa)
+        {
+
+            string[] array = new string[2];
+            string frase = "";
+            int p = 0;
+            for (int i = 0; i < stringa.Length; i++)
+            {
+                if (stringa[i] == ';')
+                {
+                    array[p] = frase;
+                    p++;
+                    frase = "";
+                }
+                else
+                {
+                    frase += stringa[i];
+                }
+
+                if (i == stringa.Length - 1)
+                {
+                    array[p] = frase;
+                }
+            }
+            return array;
+        }
+        /*
+        public void RicercaBinaria(string prodotto)
+        {
+            int s = 0;
+            int r = dim;
+            bool uscita = false;
+
+            while(s <= r && uscita == false)
+            {
+                int centro = (s + r) / 2;
+                int trovato = string.Compare(p[centro].nome, prodotto);
+
+                if(trovato == 0)
+                {
+                    indice = centro;
+                    uscita = true;
+                }
+                else if(trovato < 0)
+                {
+                    s = centro + 1;
+                }
+                else
+                {
+                    r = centro - 1;
                 }
             }
 
-            return indice;
         }
-        
+        */
     }    
 }
