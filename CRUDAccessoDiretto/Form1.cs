@@ -141,6 +141,7 @@ namespace CRUDAccessoDiretto
                 DELETE.Enabled = false;
                 QUANTITA.Enabled = false;
                 RECUPERA.Enabled = false;
+                TrovaProdotto.Enabled = false;
             }
         }
 
@@ -184,6 +185,7 @@ namespace CRUDAccessoDiretto
                 DELETE.Enabled = true;
                 QUANTITA.Enabled = true;
                 RECUPERA.Enabled = true;
+                TrovaProdotto.Enabled = true;
                 indice = -1;
                 //OrdinamentoAlfabetico();
             }
@@ -264,6 +266,12 @@ namespace CRUDAccessoDiretto
             }
             else
             {
+                CREATE.Enabled = false;
+                DELETE.Enabled = false;
+                QUANTITA.Enabled = false;
+                RECUPERA.Enabled = false;
+                TrovaProdotto.Enabled = false;
+                UPDATE.Enabled = false;
                 piuQ.Enabled = true;
                 menoQ.Enabled = true;
             }
@@ -291,6 +299,12 @@ namespace CRUDAccessoDiretto
             AggiornaLista();
             piuQ.Enabled = false;
             menoQ.Enabled = false;
+            CREATE.Enabled = true;
+            DELETE.Enabled = true;
+            QUANTITA.Enabled = true;
+            RECUPERA.Enabled = true;
+            TrovaProdotto.Enabled = true;
+            UPDATE.Enabled = true;
             indice = -1;
         }
 
@@ -318,6 +332,12 @@ namespace CRUDAccessoDiretto
             piuQ.Enabled = false;
             menoQ.Enabled = false;
             QUANTITA.Enabled = true;
+            CREATE.Enabled = true;
+            DELETE.Enabled = true;
+            QUANTITA.Enabled = true;
+            RECUPERA.Enabled = true;
+            TrovaProdotto.Enabled = true;
+            UPDATE.Enabled = true;
             indice = -1;
         }
 
@@ -537,6 +557,8 @@ namespace CRUDAccessoDiretto
 
             f_out.Close();
             f_in_out.Close();
+            StreamWriter sw = new StreamWriter("struct.txt");
+            sw.Close();
         }
 
         //GESTIONE INPUT CON VISUAL BASIC
