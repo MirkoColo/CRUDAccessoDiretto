@@ -97,11 +97,6 @@ namespace CRUDAccessoDiretto
                     }
                     else
                     {
-                        for(int i = 0; i < dim; i++)
-                        {
-                            MessageBox.Show(p[i].nome);
-                        }
-                        MessageBox.Show(indiceCanc.ToString());
                         p[indiceCanc].nome = NOME.Text;
                         f_out.BaseStream.Seek((indiceCanc) * size, SeekOrigin.Begin);
                         indiceCanc = -1;
@@ -414,6 +409,47 @@ namespace CRUDAccessoDiretto
             AggiornaLista();
         }
 
+        private void TrovaProdotto_Click(object sender, EventArgs e)
+        {
+            string message, title, defaultValue;
+            message = "Inserisci il prodotto da ricecare";
+            title = "Input prodotto";
+            defaultValue = "";
+            string prod = Interaction.InputBox(message, title, defaultValue).ToLower();
+            TrovaProd(prod);
+            if(indice == -1)
+            {
+                MessageBox.Show("Il prodotto da ricercare non è stato trovato");
+            }
+            else
+            {
+                FileStream f_in_out = new FileStream("Carrello.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                BinaryReader f_in = new BinaryReader(f_in_out);
+                byte[] br;
+                f_in.BaseStream.Seek((p[indice].CodProdotto - 1) * size, SeekOrigin.Begin);
+                br = f_in.ReadBytes(30);
+                Nome = Encoding.ASCII.GetString(br, 0, br.Length);
+                br = f_in.ReadBytes(30);
+                Prezzo = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                br = f_in.ReadBytes(2);
+                Quantita = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                br = f_in.ReadBytes(2);
+                Cancellato = int.Parse(Encoding.ASCII.GetString(br, 0, br.Length));
+                if (Cancellato == 0)
+                {
+                    MessageBox.Show($"Nome: {Nome}\nPrezzo: {Prezzo}\nQuanità: {Quantita}\nPosizione: {p[indice].CodProdotto}\n");
+                }
+                else //Il prodotto è cancellato logicamente
+                {
+                    MessageBox.Show("Il prodotto da ricercare non è stato trovato");
+                }
+                f_in.Close();
+                f_in_out.Close();
+                Nome = "@"; Prezzo = 0; Quantita = 0; Cancellato = 0;
+            }
+            indice = -1;
+        }
+
         private void LISTA_SelectedIndexChanged(object sender, EventArgs e)
         {
                        
@@ -451,17 +487,17 @@ namespace CRUDAccessoDiretto
         }
         public bool ControlloInserimento(string nome, string prezzo)
         {
-            bool dollaro = false; //non c'è il dollaro nel nome
+            bool c = false; //non c'è la chiocciola nel nome
             for(int i = 0; i < nome.Length; i++)
             {
                 if (nome[i] == '@')
                 {
-                    dollaro = true;
+                    c = true;
                 }
             }
 
             bool uscitaPrezzo = false;
-            if (prezzo.All(char.IsNumber) && dollaro == false)
+            if (prezzo.All(char.IsNumber) && c == false)
             {
                 uscitaPrezzo = true;
             }
@@ -672,6 +708,7 @@ namespace CRUDAccessoDiretto
 
 
             //OrdinamentoAlfabetico();
+            sr.Close();
             AggiornaLista();
 
         }
@@ -701,36 +738,25 @@ namespace CRUDAccessoDiretto
             Process.Start(percorso);
         }
 
+        //Evento all'uscita del programma
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            string message, title, defaultValue;
-            message = "Vuoi cancellare i prodotti?(si,no)";
-            title = "Input scelta";
-            defaultValue = "";
-            bool uscita = false;
-            while (uscita == false)
+        {            
+            DialogResult scelta = MessageBox.Show("Vuoi cancellare il file?", "Input uscita", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if(scelta == DialogResult.Yes)
             {
-                string scelta = Interaction.InputBox(message, title, defaultValue).ToLower();
-                if (scelta == "si")
-                {
-                    StreamWriter sw = new StreamWriter("struct.txt");
-                    sw.Close();
-                    CreaFile();
-                    uscita = true;
-                }
-                else if (scelta == "no")
-                {
-                    StreamWriter sw = new StreamWriter("struct.txt");
-                    for (int i = 0; i < dim; i++)
-                    {
-                        sw.WriteLine(p[i].nome + ";" + p[i].CodProdotto);
-                    }
-                    sw.Close();
-                    uscita = true;
-                    
-                }
+                StreamWriter sw = new StreamWriter("struct.txt");
+                sw.Close();
+                CreaFile();
             }
-
+            else
+            {
+                StreamWriter sw = new StreamWriter("struct.txt");
+                for (int i = 0; i < dim; i++)
+                {
+                    sw.WriteLine(p[i].nome + ";" + p[i].CodProdotto);
+                }
+                sw.Close();
+            }
         }
 
         public void RicercaCanc()
@@ -796,34 +822,47 @@ namespace CRUDAccessoDiretto
             }
             return array;
         }
-        /*
-        public void RicercaBinaria(string prodotto)
+
+        public void TrovaProd(string prod)
         {
-            int s = 0;
-            int r = dim;
-            bool uscita = false;
-
-            while(s <= r && uscita == false)
+            for (int i = 0; i < dim; i++)
             {
-                int centro = (s + r) / 2;
-                int trovato = string.Compare(p[centro].nome, prodotto);
-
-                if(trovato == 0)
+                if (p[i].nome == prod)
                 {
-                    indice = centro;
-                    uscita = true;
-                }
-                else if(trovato < 0)
-                {
-                    s = centro + 1;
-                }
-                else
-                {
-                    r = centro - 1;
+                    indice = i;
+                    break;
                 }
             }
-
         }
-        */
+
+        /*
+public void RicercaBinaria(string prodotto)
+{
+   int s = 0;
+   int r = dim;
+   bool uscita = false;
+
+   while(s <= r && uscita == false)
+   {
+       int centro = (s + r) / 2;
+       int trovato = string.Compare(p[centro].nome, prodotto);
+
+       if(trovato == 0)
+       {
+           indice = centro;
+           uscita = true;
+       }
+       else if(trovato < 0)
+       {
+           s = centro + 1;
+       }
+       else
+       {
+           r = centro - 1;
+       }
+   }
+
+}
+*/
     }    
 }

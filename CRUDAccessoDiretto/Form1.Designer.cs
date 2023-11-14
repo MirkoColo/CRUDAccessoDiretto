@@ -43,62 +43,56 @@
             this.ESCI = new System.Windows.Forms.Button();
             this.VisualizzaFie = new System.Windows.Forms.Button();
             this.RECUPERA = new System.Windows.Forms.Button();
+            this.TrovaProdotto = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LISTA
             // 
             this.LISTA.FormattingEnabled = true;
-            this.LISTA.ItemHeight = 16;
-            this.LISTA.Location = new System.Drawing.Point(795, 119);
-            this.LISTA.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.LISTA.Location = new System.Drawing.Point(596, 97);
             this.LISTA.Name = "LISTA";
-            this.LISTA.Size = new System.Drawing.Size(725, 516);
+            this.LISTA.Size = new System.Drawing.Size(545, 420);
             this.LISTA.TabIndex = 0;
             this.LISTA.SelectedIndexChanged += new System.EventHandler(this.LISTA_SelectedIndexChanged);
             // 
             // NOME
             // 
-            this.NOME.Location = new System.Drawing.Point(220, 191);
-            this.NOME.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.NOME.Location = new System.Drawing.Point(165, 155);
             this.NOME.Name = "NOME";
-            this.NOME.Size = new System.Drawing.Size(193, 22);
+            this.NOME.Size = new System.Drawing.Size(146, 20);
             this.NOME.TabIndex = 1;
             // 
             // PREZZO
             // 
-            this.PREZZO.Location = new System.Drawing.Point(220, 256);
-            this.PREZZO.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.PREZZO.Location = new System.Drawing.Point(165, 208);
             this.PREZZO.Name = "PREZZO";
-            this.PREZZO.Size = new System.Drawing.Size(193, 22);
+            this.PREZZO.Size = new System.Drawing.Size(146, 20);
             this.PREZZO.TabIndex = 2;
             // 
             // No
             // 
             this.No.AutoSize = true;
-            this.No.Location = new System.Drawing.Point(219, 171);
-            this.No.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.No.Location = new System.Drawing.Point(164, 139);
             this.No.Name = "No";
-            this.No.Size = new System.Drawing.Size(44, 16);
+            this.No.Size = new System.Drawing.Size(35, 13);
             this.No.TabIndex = 3;
             this.No.Text = "Nome";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(216, 236);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(162, 192);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(48, 16);
+            this.label2.Size = new System.Drawing.Size(39, 13);
             this.label2.TabIndex = 4;
             this.label2.Text = "Prezzo";
             this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // UPDATE
             // 
-            this.UPDATE.Location = new System.Drawing.Point(452, 315);
-            this.UPDATE.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.UPDATE.Location = new System.Drawing.Point(339, 256);
             this.UPDATE.Name = "UPDATE";
-            this.UPDATE.Size = new System.Drawing.Size(195, 60);
+            this.UPDATE.Size = new System.Drawing.Size(146, 49);
             this.UPDATE.TabIndex = 6;
             this.UPDATE.Text = "UPDATE";
             this.UPDATE.UseVisualStyleBackColor = true;
@@ -106,10 +100,9 @@
             // 
             // DELETE
             // 
-            this.DELETE.Location = new System.Drawing.Point(452, 412);
-            this.DELETE.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.DELETE.Location = new System.Drawing.Point(339, 335);
             this.DELETE.Name = "DELETE";
-            this.DELETE.Size = new System.Drawing.Size(195, 60);
+            this.DELETE.Size = new System.Drawing.Size(146, 49);
             this.DELETE.TabIndex = 7;
             this.DELETE.Text = "DELETE";
             this.DELETE.UseVisualStyleBackColor = true;
@@ -117,10 +110,9 @@
             // 
             // CREATE
             // 
-            this.CREATE.Location = new System.Drawing.Point(452, 214);
-            this.CREATE.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.CREATE.Location = new System.Drawing.Point(339, 174);
             this.CREATE.Name = "CREATE";
-            this.CREATE.Size = new System.Drawing.Size(195, 60);
+            this.CREATE.Size = new System.Drawing.Size(146, 49);
             this.CREATE.TabIndex = 8;
             this.CREATE.Text = "CREATE";
             this.CREATE.UseVisualStyleBackColor = true;
@@ -128,10 +120,10 @@
             // 
             // QUANTITA
             // 
-            this.QUANTITA.Location = new System.Drawing.Point(248, 412);
-            this.QUANTITA.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.QUANTITA.Location = new System.Drawing.Point(186, 335);
+            this.QUANTITA.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.QUANTITA.Name = "QUANTITA";
-            this.QUANTITA.Size = new System.Drawing.Size(132, 60);
+            this.QUANTITA.Size = new System.Drawing.Size(99, 49);
             this.QUANTITA.TabIndex = 9;
             this.QUANTITA.Text = "Quantità";
             this.QUANTITA.UseVisualStyleBackColor = true;
@@ -139,10 +131,10 @@
             // 
             // piuQ
             // 
-            this.piuQ.Location = new System.Drawing.Point(248, 478);
-            this.piuQ.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.piuQ.Location = new System.Drawing.Point(186, 388);
+            this.piuQ.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.piuQ.Name = "piuQ";
-            this.piuQ.Size = new System.Drawing.Size(55, 37);
+            this.piuQ.Size = new System.Drawing.Size(41, 30);
             this.piuQ.TabIndex = 10;
             this.piuQ.Text = "+";
             this.piuQ.UseVisualStyleBackColor = true;
@@ -150,10 +142,10 @@
             // 
             // menoQ
             // 
-            this.menoQ.Location = new System.Drawing.Point(323, 478);
-            this.menoQ.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.menoQ.Location = new System.Drawing.Point(242, 388);
+            this.menoQ.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.menoQ.Name = "menoQ";
-            this.menoQ.Size = new System.Drawing.Size(57, 37);
+            this.menoQ.Size = new System.Drawing.Size(43, 30);
             this.menoQ.TabIndex = 11;
             this.menoQ.Text = "-";
             this.menoQ.UseVisualStyleBackColor = true;
@@ -161,10 +153,9 @@
             // 
             // ConfermaUp
             // 
-            this.ConfermaUp.Location = new System.Drawing.Point(221, 315);
-            this.ConfermaUp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ConfermaUp.Location = new System.Drawing.Point(166, 256);
             this.ConfermaUp.Name = "ConfermaUp";
-            this.ConfermaUp.Size = new System.Drawing.Size(195, 60);
+            this.ConfermaUp.Size = new System.Drawing.Size(146, 49);
             this.ConfermaUp.TabIndex = 12;
             this.ConfermaUp.Text = "Conferma Update";
             this.ConfermaUp.UseVisualStyleBackColor = true;
@@ -172,10 +163,10 @@
             // 
             // ESCI
             // 
-            this.ESCI.Location = new System.Drawing.Point(500, 666);
-            this.ESCI.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.ESCI.Location = new System.Drawing.Point(375, 541);
+            this.ESCI.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.ESCI.Name = "ESCI";
-            this.ESCI.Size = new System.Drawing.Size(97, 52);
+            this.ESCI.Size = new System.Drawing.Size(73, 42);
             this.ESCI.TabIndex = 13;
             this.ESCI.Text = "ESCI";
             this.ESCI.UseVisualStyleBackColor = true;
@@ -183,10 +174,9 @@
             // 
             // VisualizzaFie
             // 
-            this.VisualizzaFie.Location = new System.Drawing.Point(452, 575);
-            this.VisualizzaFie.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.VisualizzaFie.Location = new System.Drawing.Point(339, 467);
             this.VisualizzaFie.Name = "VisualizzaFie";
-            this.VisualizzaFie.Size = new System.Drawing.Size(195, 60);
+            this.VisualizzaFie.Size = new System.Drawing.Size(146, 49);
             this.VisualizzaFie.TabIndex = 14;
             this.VisualizzaFie.Text = "Visualizza File";
             this.VisualizzaFie.UseVisualStyleBackColor = true;
@@ -194,20 +184,30 @@
             // 
             // RECUPERA
             // 
-            this.RECUPERA.Location = new System.Drawing.Point(452, 497);
-            this.RECUPERA.Margin = new System.Windows.Forms.Padding(4);
+            this.RECUPERA.Location = new System.Drawing.Point(339, 404);
             this.RECUPERA.Name = "RECUPERA";
-            this.RECUPERA.Size = new System.Drawing.Size(195, 60);
+            this.RECUPERA.Size = new System.Drawing.Size(146, 49);
             this.RECUPERA.TabIndex = 15;
             this.RECUPERA.Text = "Recupera";
             this.RECUPERA.UseVisualStyleBackColor = true;
             this.RECUPERA.Click += new System.EventHandler(this.RECUPERA_Click);
             // 
+            // TrovaProdotto
+            // 
+            this.TrovaProdotto.Location = new System.Drawing.Point(165, 467);
+            this.TrovaProdotto.Name = "TrovaProdotto";
+            this.TrovaProdotto.Size = new System.Drawing.Size(146, 49);
+            this.TrovaProdotto.TabIndex = 16;
+            this.TrovaProdotto.Text = "Trova Prodotto";
+            this.TrovaProdotto.UseVisualStyleBackColor = true;
+            this.TrovaProdotto.Click += new System.EventHandler(this.TrovaProdotto_Click);
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1744, 807);
+            this.ClientSize = new System.Drawing.Size(1308, 656);
+            this.Controls.Add(this.TrovaProdotto);
             this.Controls.Add(this.RECUPERA);
             this.Controls.Add(this.VisualizzaFie);
             this.Controls.Add(this.ESCI);
@@ -223,7 +223,6 @@
             this.Controls.Add(this.PREZZO);
             this.Controls.Add(this.NOME);
             this.Controls.Add(this.LISTA);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
@@ -249,6 +248,7 @@
         private System.Windows.Forms.Button ESCI;
         private System.Windows.Forms.Button VisualizzaFie;
         private System.Windows.Forms.Button RECUPERA;
+        private System.Windows.Forms.Button TrovaProdotto;
     }
 }
 
